@@ -110,6 +110,7 @@ class Tracker():
                 self.prev_issue = self.issue
                 self.issue = -1
 
+            return self.issue
             if self.issue != self.prev_issue:
                 if self.issue == 1:
                     print("Sağ dirseğinizi kaldırın.")
@@ -149,15 +150,13 @@ def main():
 
         tracker.draw_styled_landmarks(image, results)
         leftHandLms, rightHandLms, poseLms = tracker.find_positions(image, results)
-
+        
         tracker.correction(leftHandLms, rightHandLms, poseLms)
 
-        cv2.imshow('OpenCV Feed', image)
-
-        if cv2.waitKey(1) == ord('q'):
-            break
-    cap.release()
-    cv2.destroyAllWindows()
-
+        ret, buffer = cv2.imencode(".jpg", image)
+        frame = buffer.tobytes()
+        yield(b'--frame\r\n'
+              b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        
 if __name__ == "__main__":
     main()
