@@ -3,6 +3,11 @@ from holistic import *
 
 app = Flask(__name__, template_folder='templates')
 
+def play_audio(issue):
+    def generate(issue):
+        pass
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
