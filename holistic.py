@@ -1,6 +1,8 @@
 import cv2
 import mediapipe as mp
 import math
+from playsound import playsound
+import threading
 
 class Tracker():
     def __init__(self, detectionCon = 0.5, trackCon = 0.5, modelComplexity = 1):
@@ -21,7 +23,8 @@ class Tracker():
         results = self.model.process(image)
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         return image, results
-        
+
+    
     def draw_styled_landmarks(self, image, results):
         #Draw Pose Landmarks
         self.drawing.draw_landmarks(
@@ -40,6 +43,8 @@ class Tracker():
             image, results.right_hand_landmarks, self.holistic.HAND_CONNECTIONS,
             self.drawing.DrawingSpec(color = (245, 117, 66), thickness = 1, circle_radius = 2),
             self.drawing.DrawingSpec(color = (245, 66, 230), thickness = 1, circle_radius = 1))
+          
+
     
     def find_positions(self, image, results):
         leftHandLms = []
@@ -110,38 +115,13 @@ class Tracker():
                 self.prev_issue = self.issue
                 self.issue = -1
 
-            return self.issue
-            if self.issue != self.prev_issue:
-                if self.issue == 1:
-                    print("Sağ dirseğinizi kaldırın.")
-
-                elif self.issue == 2:
-                    print("Sağ dirseğinizi indirin.")
-
-                elif self.issue == 3:
-                    print("Omuzlarınızı aynı hizaya getirin.")
-
-                elif self.issue == 4:
-                    print("Sağ elinizi çenenizin altına koyun.")
-
-                elif self.issue == 5:
-                    print("Sol dirseğinizi, sol omzunuzla aynı hizaya getirin.")
-
-                elif self.issue == 6:
-                    print("Sol bileğinizi, sol dirseğinizle aynı hizaya getirin.")
-
-                elif self.issue == 7:
-                    print("Sol bileğinizi düz konuma getirin.")
-
-                elif self.issue == 8:
-                    print("Sağ bileğinizi düz konuma getirin.")
-
-                elif self.issue == -1:
-                    print("Oku atabilirsiniz.")
-
+        return self.issue, self.prev_issue
+"""
 def main():
     cap = cv2.VideoCapture(0)
     tracker = Tracker()
+
+    threading.Thread(target=sound, args=(tracker)).start()
 
     while True:
         success, image = cap.read()
@@ -149,14 +129,18 @@ def main():
         image, results = tracker.mediapipe_connection(image)
 
         tracker.draw_styled_landmarks(image, results)
+
         leftHandLms, rightHandLms, poseLms = tracker.find_positions(image, results)
         
         tracker.correction(leftHandLms, rightHandLms, poseLms)
+        
+        #show video in flask
+        ret, jpeg = cv2.imencode('.jpg', image)
+        frame = jpeg.tobytes()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
-        ret, buffer = cv2.imencode(".jpg", image)
-        frame = buffer.tobytes()
-        yield(b'--frame\r\n'
-              b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         
 if __name__ == "__main__":
     main()
+"""

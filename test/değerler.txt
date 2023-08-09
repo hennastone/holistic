@@ -1,7 +1,0 @@
-sağ omuz - sağ dirsek -> 156.60223608407392  -  146.61852435279462
-sol omuz - sağ omuz -> 1.193489423982035  -  0.2652563433759863
-burun - sağ bilek -> 28.657117456558133
-sol omuz - sol dirsek -> 179.44909602078144 - 176.82016988013575
-sol dirsek - sol bilek -> 174.93638314696992
-sol bilek - sol orta parmak -> 176.42366562500266
-sağ bilek - sağ orta parmak -> 174.70991879462875
