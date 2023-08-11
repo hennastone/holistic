@@ -1,59 +1,46 @@
-from flask import Flask, render_template, Response
+from flask import Flask, request, render_template
+import base64
+from PIL import Image
+from io import BytesIO
+import numpy as np
+from playsound import playsound
 from holistic import *
-import pygame
-import time
+
 
 app = Flask(__name__)
-
-cap = cv2.VideoCapture(0)
 tracker = Tracker()
-
-pygame.mixer.init()
-sound_channel = pygame.mixer.Channel(0)
-
-last_issue = None
 
 def play_sound(issue):
     try:
-        sound_channel.stop()  # Önceki ses çalıyorsa durdur
-        sound = pygame.mixer.Sound('sounds/' + str(issue) + '.wav')
-        sound_channel.play(sound)
+        playsound('sounds/' + str(issue) + '.wav', False)
     except Exception as e:
         print("Ses çalma hatası:", e)
 
-def generate_frames():
-    last_time = time.time()
-    while True:
-        success, frame = cap.read()
-        if not success:
-            break
-        else:
-            frame, results = tracker.mediapipe_connection(frame)
-            tracker.draw_styled_landmarks(frame, results)
-            leftHandLms, rightHandLms, poseLms = tracker.find_positions(frame, results)
-            issue, prev_issue = tracker.correction(leftHandLms, rightHandLms, poseLms)
+@app.route('/receive_image', methods=['POST'])
+def receive_image():
+    image_data = request.form['imageData']  # FormData'dan gelen 'imageData' alanı
+    image_data = image_data.split(',')[1]  # Veri URI kısmını ayır
+    image = base64.b64decode(image_data)
+    image = Image.open(BytesIO(image))
+    # Burada image ile yapmak istediğin işlemleri yapabilirsin
+    
+    image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+    cv2.imshow('image', image)
 
-            current_time = time.time()
+    frame, results = tracker.mediapipe_connection(image)
+    tracker.draw_styled_landmarks(frame, results)
+    leftHandLms, rightHandLms, poseLms = tracker.find_positions(frame, results)
+    issue, _ = tracker.correction(leftHandLms, rightHandLms, poseLms)
+    
+    if issue != 0:
+        play_sound(issue)
 
-            if current_time - last_time > 5:
-                if issue != prev_issue and issue != 0:
-                    play_sound(issue)
-                    last_time = current_time
 
-            frame = cv2.flip(frame, 1)
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    return 'Görüntü alındı ve işlendi'
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
 
-@app.route('/video_feed')
-def video_feed():
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
-
+    app.run(port=8080, debug=True)

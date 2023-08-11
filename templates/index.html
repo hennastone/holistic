@@ -1,12 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canlı Video İletişimi</title>
 </head>
 <body>
-    <h1>Video App with Issue Detection</h1>
-    <img src="{{ url_for('video_feed') }}" width="640" height="480" alt="Video Stream">
+  <video id="videoElement" autoplay width="640" height="480"></video>
+  <script>
+  const canvasWidth = 640; // Yeni genişlik
+  const canvasHeight = 480; // Yeni yükseklik
+
+  const videoElement = document.getElementById('videoElement');
+  const canvas = document.createElement('canvas');
+  canvas.width = canvasWidth; // canvas'ın yeni genişliği
+  canvas.height = canvasHeight; // canvas'ın yeni yüksekliği
+  const context = canvas.getContext('2d');
+
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+      videoElement.srcObject = stream;
+      videoElement.play();
+
+      setInterval(() => {
+        context.drawImage(videoElement, 0, 0, canvasWidth, canvasHeight); // Görüntüyü çizimden önce boyutlandır
+        const imageData = canvas.toDataURL('image/jpeg'); // Yeniden boyutlandırılmış görüntü verisi
+        sendImageDataToServer(imageData);
+      }, 5000); // Her saniyede bir görüntüyü yakalayıp gönder
+    })
+    .catch(error => console.error('Hata:', error));
+
+  function sendImageDataToServer(imageData) {
+    const formData = new FormData();
+    formData.append('imageData', imageData);
+
+    fetch('/receive_image', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.text())
+    .then(result => {
+      console.log(result); // Sunucudan dönen yanıtı konsola yazdır
+    })
+    .catch(error => console.error('Sunucu Hatası:', error));
+  }
+  </script>
 </body>
 </html>

@@ -1,8 +1,7 @@
 import cv2
 import mediapipe as mp
 import math
-from playsound import playsound
-import threading
+
 
 class Tracker():
     def __init__(self, detectionCon = 0.5, trackCon = 0.5, modelComplexity = 1):
@@ -91,9 +90,6 @@ class Tracker():
                 self.prev_issue = self.issue
                 self.issue = 3
 
-            elif(abs(self.calculate_angle(poseLms[0], rightHandLms[0]) - 30) > 10):
-                self.prev_issue = self.issue
-                self.issue = 4
 
             elif(abs(self.calculate_angle(poseLms[11], poseLms[13]) - 180) > 10):
                 self.prev_issue = self.issue
