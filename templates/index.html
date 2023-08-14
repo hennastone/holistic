@@ -8,42 +8,57 @@
 <body>
   <video id="videoElement" autoplay width="640" height="480"></video>
   <script>
-  const canvasWidth = 640; // Yeni genişlik
-  const canvasHeight = 480; // Yeni yükseklik
+    const canvasWidth = 640; // Yeni genişlik
+    const canvasHeight = 480; // Yeni yükseklik
 
-  const videoElement = document.getElementById('videoElement');
-  const canvas = document.createElement('canvas');
-  canvas.width = canvasWidth; // canvas'ın yeni genişliği
-  canvas.height = canvasHeight; // canvas'ın yeni yüksekliği
-  const context = canvas.getContext('2d');
+    const videoElement = document.getElementById('videoElement');
+    const canvas = document.createElement('canvas');
+    canvas.width = canvasWidth; // canvas'ın yeni genişliği
+    canvas.height = canvasHeight; // canvas'ın yeni yüksekliği
+    const context = canvas.getContext('2d');
 
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => {
-      videoElement.srcObject = stream;
-      videoElement.play();
+    // Ses çalmak için kullanacağınız ses öğesi
+    const audioElement = new Audio();
 
-      setInterval(() => {
-        context.drawImage(videoElement, 0, 0, canvasWidth, canvasHeight); // Görüntüyü çizimden önce boyutlandır
-        const imageData = canvas.toDataURL('image/jpeg'); // Yeniden boyutlandırılmış görüntü verisi
-        sendImageDataToServer(imageData);
-      }, 5000); // Her saniyede bir görüntüyü yakalayıp gönder
-    })
-    .catch(error => console.error('Hata:', error));
+    // Sunucudan dönen yanıta göre ses çalma işlemini gerçekleştir
+    function playSound(issue) {
+      if (issue !== 0) {
+        // issue değerine göre ses dosyasının yolunu belirleyin
+        const soundFilePath = `sounds/${issue}.wav`;
+        audioElement.src = soundFilePath;
+        audioElement.play();
+      }
+    }
 
-  function sendImageDataToServer(imageData) {
-    const formData = new FormData();
-    formData.append('imageData', imageData);
+    // Sunucudan dönen yanıtı alarak ses çalma işlemini gerçekleştir
+    function sendImageDataToServer(imageData) {
+      const formData = new FormData();
+      formData.append('imageData', imageData);
 
-    fetch('/receive_image', {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => response.text())
-    .then(result => {
-      console.log(result); // Sunucudan dönen yanıtı konsola yazdır
-    })
-    .catch(error => console.error('Sunucu Hatası:', error));
-  }
+      fetch('/receive_image', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.text())
+      .then(result => {
+        console.log(result); // Sunucudan dönen yanıtı konsola yazdır
+        playSound(parseInt(result)); // Gelen sonuç değerine göre ses çal
+      })
+      .catch(error => console.error('Sunucu Hatası:', error));
+    }
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        videoElement.srcObject = stream;
+        videoElement.play();
+
+        setInterval(() => {
+          context.drawImage(videoElement, 0, 0, canvasWidth, canvasHeight); // Görüntüyü çizimden önce boyutlandır
+          const imageData = canvas.toDataURL('image/jpeg'); // Yeniden boyutlandırılmış görüntü verisi
+          sendImageDataToServer(imageData);
+        }, 5000); // Her saniyede bir görüntüyü yakalayıp gönder
+      })
+      .catch(error => console.error('Hata:', error));
   </script>
 </body>
 </html>
