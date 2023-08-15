@@ -8,57 +8,63 @@
 <body>
   <video id="videoElement" autoplay width="640" height="480"></video>
   <script>
-    const canvasWidth = 640; // Yeni genişlik
-    const canvasHeight = 480; // Yeni yükseklik
+    const canvasWidth = 640;
+const canvasHeight = 480;
 
-    const videoElement = document.getElementById('videoElement');
-    const canvas = document.createElement('canvas');
-    canvas.width = canvasWidth; // canvas'ın yeni genişliği
-    canvas.height = canvasHeight; // canvas'ın yeni yüksekliği
-    const context = canvas.getContext('2d');
+const videoElement = document.getElementById('videoElement');
+const canvas = document.createElement('canvas');
+canvas.width = canvasWidth;
+canvas.height = canvasHeight;
+const context = canvas.getContext('2d');
 
-    // Ses çalmak için kullanacağınız ses öğesi
-    const audioElement = new Audio();
+const audioElement = new Audio();
 
-    // Sunucudan dönen yanıta göre ses çalma işlemini gerçekleştir
-    function playSound(issue) {
-      if (issue !== 0) {
-        // issue değerine göre ses dosyasının yolunu belirleyin
-        const soundFilePath = `sounds/${issue}.wav`;
-        audioElement.src = soundFilePath;
-        audioElement.play();
-      }
-    }
+function playSound(issue) {
+  if (issue !== 0) {
+    const soundFilePath = `static/sounds/${issue}.wav`;
+    audioElement.src = soundFilePath;
+    audioElement.play();
+  }
+}
 
-    // Sunucudan dönen yanıtı alarak ses çalma işlemini gerçekleştir
-    function sendImageDataToServer(imageData) {
-      const formData = new FormData();
-      formData.append('imageData', imageData);
+function sendImageDataToServer(imageData) {
+  const formData = new FormData();
+  formData.append('imageData', imageData);
 
-      fetch('/receive_image', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.text())
-      .then(result => {
-        console.log(result); // Sunucudan dönen yanıtı konsola yazdır
-        playSound(parseInt(result)); // Gelen sonuç değerine göre ses çal
-      })
-      .catch(error => console.error('Sunucu Hatası:', error));
-    }
+  // Oturum anahtarını başlık olarak ekleyin
+  formData.append('session_key', localStorage.getItem('sessionKey'));
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        videoElement.srcObject = stream;
-        videoElement.play();
+  fetch('/receive_image', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    const issue = data.issue;
+    playSound(issue);
+  })
+  .catch(error => console.error('Sunucu Hatası:', error));
+}
 
-        setInterval(() => {
-          context.drawImage(videoElement, 0, 0, canvasWidth, canvasHeight); // Görüntüyü çizimden önce boyutlandır
-          const imageData = canvas.toDataURL('image/jpeg'); // Yeniden boyutlandırılmış görüntü verisi
-          sendImageDataToServer(imageData);
-        }, 5000); // Her saniyede bir görüntüyü yakalayıp gönder
-      })
-      .catch(error => console.error('Hata:', error));
+
+let lastTime = 0;
+function captureAndSendImage(timestamp) {
+  if (timestamp - lastTime >= 5000) {
+    lastTime = timestamp;
+    context.drawImage(videoElement, 0, 0, canvasWidth, canvasHeight);
+    const imageData = canvas.toDataURL('image/jpeg');
+    sendImageDataToServer(imageData);
+  }
+  requestAnimationFrame(captureAndSendImage);
+}
+
+navigator.mediaDevices.getUserMedia({ video: true })
+  .then(stream => {
+    videoElement.srcObject = stream;
+    videoElement.play();
+    requestAnimationFrame(captureAndSendImage);
+  })
+  .catch(error => console.error('Hata:', error));
   </script>
 </body>
 </html>

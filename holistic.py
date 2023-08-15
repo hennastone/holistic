@@ -1,5 +1,5 @@
 import cv2
-import mediapipe as mp
+from mediapipe.python.solutions import holistic, drawing_utils
 import math
 
 
@@ -8,8 +8,8 @@ class Tracker():
         self.detectionCon = detectionCon
         self.trackCon = trackCon
         self.modelComplexity = modelComplexity
-        self.drawing = mp.solutions.drawing_utils
-        self.holistic = mp.solutions.holistic
+        self.drawing = drawing_utils
+        self.holistic = holistic
         self.model = self.holistic.Holistic(
                                     min_detection_confidence = self.detectionCon, 
                                     min_tracking_confidence = self.trackCon,

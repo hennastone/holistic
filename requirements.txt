@@ -3,4 +3,4 @@ flask-cors
 gunicorn
 opencv-python
 mediapipe==0.10.2
-playsound==1.2.2
+matplotlib
