@@ -8,24 +8,24 @@
 <body>
   <video id="videoElement" autoplay width="640" height="480"></video>
   <script>
-    const canvasWidth = 640;
-const canvasHeight = 480;
+  const canvasWidth = 640;
+  const canvasHeight = 480;
 
-const videoElement = document.getElementById('videoElement');
-const canvas = document.createElement('canvas');
-canvas.width = canvasWidth;
-canvas.height = canvasHeight;
-const context = canvas.getContext('2d');
+  const videoElement = document.getElementById('videoElement');
+  const canvas = document.createElement('canvas');
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  const context = canvas.getContext('2d');
 
-const audioElement = new Audio();
+  const audioElement = new Audio();
 
-function playSound(issue) {
-  if (issue !== 0) {
-    const soundFilePath = `static/sounds/${issue}.wav`;
-    audioElement.src = soundFilePath;
-    audioElement.play();
+  function playSound(issue) {
+    if (issue !== 0) {
+      const soundFilePath = `static/sounds/${issue}.wav`;
+      audioElement.src = soundFilePath;
+      audioElement.play();
+    }
   }
-}
 
 function sendImageDataToServer(imageData) {
   const formData = new FormData();
@@ -40,8 +40,8 @@ function sendImageDataToServer(imageData) {
   })
   .then(response => response.json())
   .then(data => {
-    const issue = data.issue;
-    playSound(issue);
+    const issues = data.issues;
+    playSound(issues[0]);
   })
   .catch(error => console.error('Sunucu Hatası:', error));
 }

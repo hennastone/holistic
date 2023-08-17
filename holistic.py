@@ -14,8 +14,7 @@ class Tracker():
                                     min_detection_confidence = self.detectionCon, 
                                     min_tracking_confidence = self.trackCon,
                                     model_complexity = self.modelComplexity)
-        self.issue = 0
-        self.prev_issue = 0
+
     
     def mediapipe_connection(self, image):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -76,67 +75,35 @@ class Tracker():
         return abs(degree)
     
     def correction(self, leftHandLms, rightHandLms, poseLms):
+        issues = []
         if len(leftHandLms) != 0 and len(rightHandLms) != 0 and len(poseLms) != 0:
 
             if(self.calculate_angle(poseLms[14], poseLms[12]) > 160):
-                self.prev_issue = self.issue
-                self.issue = 1
+                issues.append(1)
 
             elif(self.calculate_angle(poseLms[14], poseLms[12]) < 140):
-                self.prev_issue = self.issue
-                self.issue = 2
+                issues.append(2)
 
             elif(self.calculate_angle(poseLms[11], poseLms[12]) > 5):
-                self.prev_issue = self.issue
-                self.issue = 3
+                issues.append(3)
 
 
             elif(abs(self.calculate_angle(poseLms[11], poseLms[13]) - 180) > 10):
-                self.prev_issue = self.issue
-                self.issue = 5
+                issues.append(5)
 
             elif(abs(self.calculate_angle(poseLms[13], leftHandLms[0]) - 180) > 10):
-                self.prev_issue = self.issue
-                self.issue = 6
+                issues.append(6)
 
             elif(abs(self.calculate_angle(leftHandLms[0], leftHandLms[9]) - 170) > 10):
-                self.prev_issue = self.issue
-                self.issue = 7
+                issues.append(7)
 
             elif(abs(self.calculate_angle(rightHandLms[0], rightHandLms[9]) - 170) > 10):
-                self.prev_issue = self.issue
-                self.issue = 8
+                issues.append(8)
             
             else:
-                self.prev_issue = self.issue
-                self.issue = -1
+                issues = [-1]
+        else:
+            issues = [9]
 
-        return self.issue, self.prev_issue
-"""
-def main():
-    cap = cv2.VideoCapture(0)
-    tracker = Tracker()
+        return issues
 
-    threading.Thread(target=sound, args=(tracker)).start()
-
-    while True:
-        success, image = cap.read()
-
-        image, results = tracker.mediapipe_connection(image)
-
-        tracker.draw_styled_landmarks(image, results)
-
-        leftHandLms, rightHandLms, poseLms = tracker.find_positions(image, results)
-        
-        tracker.correction(leftHandLms, rightHandLms, poseLms)
-        
-        #show video in flask
-        ret, jpeg = cv2.imencode('.jpg', image)
-        frame = jpeg.tobytes()
-        yield (b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
-        
-if __name__ == "__main__":
-    main()
-"""
