@@ -87,7 +87,6 @@ class Tracker():
             elif(self.calculate_angle(poseLms[11], poseLms[12]) > 5):
                 issues.append(3)
 
-
             elif(abs(self.calculate_angle(poseLms[11], poseLms[13]) - 180) > 10):
                 issues.append(5)
 

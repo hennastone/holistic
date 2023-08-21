@@ -7,7 +7,40 @@
 </head>
 <body>
   <video id="videoElement" autoplay width="640" height="480"></video>
+  <canvas id="canvas2" width="640" height="480"></canvas>
   <script>
+    const image = new Image();
+    image.src = 'https://www.trtspor.com.tr/dosyalar/images/7bf0846c-07ba-419d-a343-d1877ad42898.jpg';
+
+    const canvas2 = document.getElementById('canvas2');
+    const context2 = canvas2.getContext('2d');
+
+    
+      // Belirli konumları ve nokta renklerini ayarlayın
+    let points = [
+      { x: 50, y: 240, color: 'red' },
+      { x: 150, y:  250, color: 'red' },
+      { x: 150, y:  300, color: 'red' },
+      { x: 265, y:  290, color: 'red' },
+      { x: 370, y:  275, color: 'red' },
+      { x: 475, y:  250, color: 'red' },
+      { x: 508, y:  243, color: 'red' },
+      // Diğer noktaları burada ekleyin
+    ];
+
+    image.onload = function() {
+      context2.drawImage(image, 0, 0, canvas2.width, canvas2.height);
+
+
+      // Noktaları çizin
+      points.forEach(point => {
+        context2.beginPath();
+        context2.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+        context2.fillStyle = point.color;
+        context2.fill();
+        context2.closePath();
+      });
+    };
   const canvasWidth = 640;
   const canvasHeight = 480;
 
@@ -26,13 +59,19 @@
       audioElement.play();
     }
   }
+  function drawColoredPoint(context, x, y, color) {
+  context.beginPath();
+  context.arc(x, y, 5, 0, 2 * Math.PI);
+  context.fillStyle = color;
+  context.fill();
+  context.closePath();
+}
+
 
 function sendImageDataToServer(imageData) {
   const formData = new FormData();
   formData.append('imageData', imageData);
 
-  // Oturum anahtarını başlık olarak ekleyin
-  formData.append('session_key', localStorage.getItem('sessionKey'));
 
   fetch('/receive_image', {
     method: 'POST',
@@ -42,8 +81,58 @@ function sendImageDataToServer(imageData) {
   .then(data => {
     const issues = data.issues;
     playSound(issues[0]);
-  })
+    
+  if (issues.includes(9) == true){
+    points.forEach(point => {
+      drawColoredPoint(context2, point.x, point.y, 'red');
+    });
+  }
+
+  else if (issues.includes(-1) == true){
+    points.forEach(point => {
+      drawColoredPoint(context2, point.x, point.y, 'green');
+    });
+  }
+  
+  else {
+    if (issues.includes(1) || issues.includes(2)) {
+      drawColoredPoint(context2, points[0].x, points[0].y, 'red');
+    } else {
+      drawColoredPoint(context2, points[0].x, points[0].y, 'green');
+    }
+
+
+    if (issues.includes(3)) {
+      drawColoredPoint(context2, points[2].x, points[2].y, 'red');
+      drawColoredPoint(context2, points[3].x, points[3].y, 'red');
+    } else {
+      drawColoredPoint(context2, points[2].x, points[2].y, 'green');
+      drawColoredPoint(context2, points[3].x, points[3].y, 'green');
+    }
+    if (issues.includes(5)){
+      drawColoredPoint(context2, points[4].x, points[4].y, 'red');
+    } else {
+      drawColoredPoint(context2, points[4].x, points[4].y, 'green');
+    }
+    if (issues.includes(6)){
+      drawColoredPoint(context2, points[5].x, points[5].y, 'red');
+    } else {
+      drawColoredPoint(context2, points[5].x, points[5].y, 'green');
+    }
+    if (issues.includes(7)){
+      drawColoredPoint(context2, points[6].x, points[6].y, 'red');
+    } else {
+      drawColoredPoint(context2, points[6].x, points[6].y, 'green');
+    }
+    if (issues.includes(8)){
+      drawColoredPoint(context2, points[7].x, points[7].y, 'red');
+    } else {
+      drawColoredPoint(context2, points[7].x, points[7].y, 'green');
+    }
+    }})
   .catch(error => console.error('Sunucu Hatası:', error));
+
+
 }
 
 
