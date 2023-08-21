@@ -13,7 +13,7 @@ app = Flask(__name__)
 def receive_image():
     tracker = Tracker()
 
-    image_data = request.form['imageData']  # FormData'dan gelen 'imageData' alanı
+    image_data = request.form['imageData']  # FormData'dan gelen 'imageData' alani
     image_data = image_data.split(',')[1]  # Veri URI kısmını ayır
     image = base64.b64decode(image_data)
     image = Image.open(BytesIO(image))
