@@ -14,6 +14,7 @@ class Tracker():
                                     min_detection_confidence = self.detectionCon, 
                                     min_tracking_confidence = self.trackCon,
                                     model_complexity = self.modelComplexity)
+        self.closed = False
 
     
     def mediapipe_connection(self, image):
@@ -73,6 +74,11 @@ class Tracker():
         radian = math.atan2(a[2]-b[2], a[1]-b[1])
         degree = math.degrees(radian)
         return abs(degree)
+    
+    def close(self):
+        if not self.closed:
+            self.model.close()  
+            self.closed = True
     
     def correction(self, leftHandLms, rightHandLms, poseLms):
         issues = []
