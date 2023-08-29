@@ -24,6 +24,7 @@ def receive_image():
     issues= tracker.correction(leftHandLms, rightHandLms, poseLms)
 
     tracker.close()
+    del tracker
 
     return jsonify({"issues": issues})
 

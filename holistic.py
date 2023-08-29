@@ -23,7 +23,7 @@ class Tracker():
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         return image, results
 
-    
+    """
     def draw_styled_landmarks(self, image, results):
         #Draw Pose Landmarks
         self.drawing.draw_landmarks(
@@ -42,7 +42,7 @@ class Tracker():
             image, results.right_hand_landmarks, self.holistic.HAND_CONNECTIONS,
             self.drawing.DrawingSpec(color = (245, 117, 66), thickness = 1, circle_radius = 2),
             self.drawing.DrawingSpec(color = (245, 66, 230), thickness = 1, circle_radius = 1))
-          
+    """    
 
     
     def find_positions(self, image, results):
