@@ -6,26 +6,24 @@
   <title>Canlı Video İletişimi</title>
 </head>
 <body>
-  <video id="videoElement" autoplay width="640" height="480"></video>
-  <canvas id="canvas2" width="640" height="480"></canvas>
+  <video id="videoElement" autoplay width="640" height="640"></video>
+  <canvas id="canvas2" width="640" height="640"></canvas>
   <script>
     const image = new Image();
-    image.src = 'https://www.trtspor.com.tr/dosyalar/images/7bf0846c-07ba-419d-a343-d1877ad42898.jpg';
-
+    image.src = 'https://png.pngtree.com/png-vector/20220713/ourmid/pngtree-png-image-of-a-man-shooting-with-bow-png-image_5931591.png';
     const canvas2 = document.getElementById('canvas2');
     const context2 = canvas2.getContext('2d');
 
     
-      // Belirli konumları ve nokta renklerini ayarlayın
+      // Belirli konumları ve nokta renklerini ayarla
     let points = [
-      { x: 50, y: 240, color: 'red' },
-      { x: 150, y:  250, color: 'red' },
-      { x: 150, y:  300, color: 'red' },
-      { x: 265, y:  290, color: 'red' },
-      { x: 370, y:  275, color: 'red' },
-      { x: 475, y:  250, color: 'red' },
-      { x: 508, y:  243, color: 'red' },
-      // Diğer noktaları burada ekleyin
+      { x: 75, y: 320, color: 'red' },
+      { x: 200, y:  330, color: 'red' },
+      { x: 175, y:  355, color: 'red' },
+      { x: 265, y:  355, color: 'red' },
+      { x: 345, y:  352, color: 'red' },
+      { x: 415, y:  350, color: 'red' },
+      { x: 445, y:  350, color: 'red' },
     ];
 
     image.onload = function() {
@@ -35,7 +33,7 @@
       // Noktaları çizin
       points.forEach(point => {
         context2.beginPath();
-        context2.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+        context2.arc(point.x, point.y, 7, 0, 2 * Math.PI);
         context2.fillStyle = point.color;
         context2.fill();
         context2.closePath();
@@ -61,7 +59,7 @@
   }
   function drawColoredPoint(context, x, y, color) {
   context.beginPath();
-  context.arc(x, y, 5, 0, 2 * Math.PI);
+  context.arc(x, y, 7, 0, 2 * Math.PI);
   context.fillStyle = color;
   context.fill();
   context.closePath();

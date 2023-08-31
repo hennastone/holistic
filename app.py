@@ -5,21 +5,22 @@ from io import BytesIO
 import numpy as np
 from holistic import *
 
+
 app = Flask(__name__)
 
 @app.route('/receive_image', methods=['POST'])
 def receive_image():
-    image_data = request.form['imageData']  # FormData'dan gelen 'imageData' alanı
-    image_data = image_data.split(',')[1]  # Veri URI kısmını ayır
+    image_data = request.form['imageData'] 
+    image_data = image_data.split(',')[1]  
     image = base64.b64decode(image_data)
-    image = Image.open(BytesIO(image))    # Burada image ile yapmak istediğin işlemleri yapabilirsin
+    image = Image.open(BytesIO(image))    
     
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
 
     tracker = Tracker()
 
     frame, results = tracker.mediapipe_connection(image)
-    tracker.draw_styled_landmarks(frame, results)
+    #tracker.draw_styled_landmarks(frame, results)
     leftHandLms, rightHandLms, poseLms = tracker.find_positions(frame, results)
     issues= tracker.correction(leftHandLms, rightHandLms, poseLms)
 
