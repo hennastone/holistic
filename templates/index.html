@@ -4,19 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Canlı Video İletişimi</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #videoElement,
+    #canvas2 {
+      width: 600px;
+      height: 600px;
+    }
+
+    #counterDisplay {
+      font-size: 5.75em;
+      font-weight: bolder;
+      margin-top: 20px;
+    }
+
+    #resetCounter {
+      font-size: 1em;
+    }
+  </style>
 </head>
 <body>
-  <video id="videoElement" autoplay width="640" height="640"></video>
-  <canvas id="canvas2" width="640" height="640"></canvas>
-  <div id="counterDisplay" style=
-  "font-size: 5.75em;
-  width: 1920px;
-  justify-content: center;
-  font-weight: bolder;
-  ">0</div>
-  <div style=" display: flex; justify-content: center;
-  ">
-    <button id="resetCounter"  >Sıfırla</button>
+  <div id="videoContainer">
+    <video id="videoElement" autoplay width="640" height="640"></video>
+    <canvas id="canvas2" width="640" height="640"></canvas>
+  </div>
+  <div id="controls">
+    <div id="counterDisplay">0</div>
+    <button id="resetCounter">Sıfırla</button>
   </div>
   <script>
     const image = new Image();
