@@ -8,11 +8,22 @@
 <body>
   <video id="videoElement" autoplay width="640" height="640"></video>
   <canvas id="canvas2" width="640" height="640"></canvas>
+  <div id="counterDisplay" style=
+  "font-size: 5.75em;
+  width: 1920px;
+  justify-content: center;
+  font-weight: bolder;
+  ">0</div>
+  <div style=" display: flex; justify-content: center;
+  ">
+    <button id="resetCounter"  >Sıfırla</button>
+  </div>
   <script>
     const image = new Image();
     image.src = 'https://png.pngtree.com/png-vector/20220713/ourmid/pngtree-png-image-of-a-man-shooting-with-bow-png-image_5931591.png';
     const canvas2 = document.getElementById('canvas2');
     const context2 = canvas2.getContext('2d');
+    let counter = 0;
 
     
       // Belirli konumları ve nokta renklerini ayarla
@@ -39,6 +50,8 @@
         context2.closePath();
       });
     };
+  const counterDisplay = document.getElementById('counterDisplay');
+  const resetButton = document.getElementById('resetCounter');
   const canvasWidth = 640;
   const canvasHeight = 480;
 
@@ -50,6 +63,11 @@
 
   const audioElement = new Audio();
 
+  resetButton.addEventListener('click', () => {
+  counter = 0;
+  updateCounterDisplay(); // Sayaçı güncelleyin
+  });
+
   function playSound(issue) {
     if (issue !== 0) {
       const soundFilePath = `static/sounds/${issue}.wav`;
@@ -57,13 +75,18 @@
       audioElement.play();
     }
   }
+
+  function updateCounterDisplay() {
+  counterDisplay.textContent = counter;
+  }
+
   function drawColoredPoint(context, x, y, color) {
   context.beginPath();
   context.arc(x, y, 7, 0, 2 * Math.PI);
   context.fillStyle = color;
   context.fill();
   context.closePath();
-}
+  }
 
 
 function sendImageDataToServer(imageData) {
@@ -83,16 +106,22 @@ function sendImageDataToServer(imageData) {
   if (issues.includes(9) == true){
     points.forEach(point => {
       drawColoredPoint(context2, point.x, point.y, 'red');
+      counter = 0;
+      updateCounterDisplay();
     });
   }
 
   else if (issues.includes(-1) == true){
     points.forEach(point => {
       drawColoredPoint(context2, point.x, point.y, 'green');
+      counter = 0;
+      updateCounterDisplay();
     });
   }
   
   else {
+    counter++;
+    updateCounterDisplay();
     if (issues.includes(1) || issues.includes(2)) {
       drawColoredPoint(context2, points[0].x, points[0].y, 'red');
     } else {
@@ -155,3 +184,38 @@ navigator.mediaDevices.getUserMedia({ video: true })
   </script>
 </body>
 </html>
+
+<style>
+#counterDisplay {
+ display: table-cell;
+ text-align: center;
+ vertical-align: middle;
+}
+
+#counterDisplay:before {
+ position: absolute;
+ top: -1;
+ left: 0;
+ width: 100vw;
+ height: 10vh;
+ background: rgba(10, 10, 10, 10, 10);
+}
+#counterDisplay:after {
+ position: absolute;
+ bottom: 0;
+ left: 0;
+ width: 100vw;
+ height: 12vh;
+}
+
+#result {
+ text-transform: uppercase;
+}
+a:link,
+a:hover,
+a:visited,
+a:active {
+ text-decoration: bold;
+}
+
+</style>
