@@ -22,7 +22,7 @@ def receive_image():
     frame, results = tracker.mediapipe_connection(image)
     #tracker.draw_styled_landmarks(frame, results)
     leftHandLms, rightHandLms, poseLms = tracker.find_positions(frame, results)
-    issues= tracker.correction(leftHandLms, rightHandLms, poseLms)
+    issues = tracker.correction(leftHandLms, rightHandLms, poseLms)
 
     tracker.close()
     del tracker
