@@ -40,12 +40,18 @@
     <div id="counterDisplay">0</div>
     <button id="resetCounter">Sıfırla</button>
   </div>
+  <div id="scoreDisplay">
+    <p>En İyi Skor: <span id="highestScore">0</span></p>
+    <p>Son Skor: <span id="currentScore">0</span></p>
+  </div>
   <script>
     const image = new Image();
     image.src = 'https://png.pngtree.com/png-vector/20220713/ourmid/pngtree-png-image-of-a-man-shooting-with-bow-png-image_5931591.png';
     const canvas2 = document.getElementById('canvas2');
     const context2 = canvas2.getContext('2d');
     let counter = 0;
+    const highestScoreElement = document.getElementById('highestScore');
+    const currentScoreElement = document.getElementById('currentScore');
 
     
       // Belirli konumları ve nokta renklerini ayarla
@@ -58,6 +64,11 @@
       { x: 415, y:  350, color: 'red' },
       { x: 445, y:  350, color: 'red' },
     ];
+
+    window.onload = function () {
+    updateHighestScore(100);
+    updateCurrentScore(100);
+  };
 
     image.onload = function() {
       context2.drawImage(image, 0, 0, canvas2.width, canvas2.height);
@@ -98,8 +109,16 @@
     }
   }
 
+  function updateCurrentScore(score) {
+    currentScoreElement.textContent = score;
+  }
+
+  function updateHighestScore(score) {
+    highestScoreElement.textContent = score;
+  }
+
   function updateCounterDisplay() {
-  counterDisplay.textContent = counter;
+    counterDisplay.textContent = counter;
   }
 
   function drawColoredPoint(context, x, y, color) {
@@ -134,11 +153,16 @@ function sendImageDataToServer(imageData) {
   }
 
   else if (issues.includes(-1) == true){
+    counter++;
     points.forEach(point => {
       drawColoredPoint(context2, point.x, point.y, 'green');
-      counter = 0;
-      updateCounterDisplay();
     });
+    if (counter < parseInt(highestScoreElement.textContent)){
+      updateHighestScore(counter);
+    }
+    updateCurrentScore(counter);
+    counter = 0;
+    updateCounterDisplay();
   }
   
   else {
