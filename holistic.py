@@ -1,5 +1,4 @@
 from mediapipe.python.solutions import holistic, drawing_utils
-import cv2
 import math
 
 
